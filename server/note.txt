@@ -1,0 +1,9 @@
+I have crate this "resetPasswordToken" column before, but later I have removed it from db using this migration script
+======================
+npx sequelize-cli migration:generate --name remove-resetPasswordToken-from-user ========== this will just create the migration file, then we have to edit it accordingly.
+npx sequelize-cli db:migrate
+======================
+here we are using the type module i.e ES module
+that's need to rename the migration file to .cjs (common js) because,
+
+You're getting this error because you're using ES Modules ("type": "module"), but sequelize-cli and its dependency umzug expect CommonJS when loading migration files. This is a common conflict.
