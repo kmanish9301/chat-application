@@ -10,7 +10,13 @@ const sendMessage = expressAsyncHandler(async (req, res) => {
     }
     const {chatId, senderId, message} = req.body;
     const createdMessage = await Message.create({chatId, senderId, message});
-    console.log("createdMessage", createdMessage);
+
+    req.app.get("io").to(chatId).emit("receiveMessage", {
+        chatId,
+        message,
+        senderId,
+        createdAt: createdMessage.createdAt,
+    });
 
     return res.status(200).json({success: true, message: "Message created"});
 });
@@ -30,7 +36,6 @@ const getMessage = expressAsyncHandler(async (req, res) => {
             {model: User, as: "sender", attributes: ["id", "user_name", "email"]},
         ]
     })
-    console.log("receivedMessage", receivedMessage);
     return res.status(200).json({success: true, message: "Message received", result: receivedMessage});
 })
 
