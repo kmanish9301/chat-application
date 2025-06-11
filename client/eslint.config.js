@@ -33,6 +33,8 @@ export default tseslint.config(
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": 0,
       "react/no-unescaped-entities": 0,
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "warn"
     },
   },
 )

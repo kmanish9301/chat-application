@@ -3,14 +3,18 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const http = require("http");
-const {Server} = require("socket.io");
-const {NotFoundError, errorHandler} = require("./src/middlewares/ErrorMiddleware");
+const { Server } = require("socket.io");
+const { NotFoundError, errorHandler } = require("./src/middlewares/ErrorMiddleware");
 const UserRoutes = require("./src/routes/UserRoute");
 const ChatRoutes = require("./src/routes/ChatRoute");
 const MessageRoutes = require("./src/routes/MessageRoute");
-const {connectDB} = require("./src/config/db");
+const { connectDB } = require("./src/config/db");
 
-dotenv.config({path: path.resolve(__dirname, "environment", ".env.develop")});
+// Load env based on NODE_ENV
+const env = process.env.NODE_ENV || 'development';
+dotenv.config({ path: path.resolve(__dirname, `environment/.env.${env}`) });
+
+console.log(`Environment: ${process.env.NODE_ENV}`);
 
 const app = express();
 const server = http.createServer(app);

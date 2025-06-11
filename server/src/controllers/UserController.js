@@ -1,22 +1,22 @@
 const bcrypt = require('bcrypt');
 const expressAsyncHandler = require('express-async-handler');
-const {generateToken} = require('../middlewares/AuthMiddleware');
+const { generateToken } = require('../middlewares/AuthMiddleware');
 const db = require("../models/index");
-const {createUserValidationSchema} = require('../utils/Validators');
+const { createUserValidationSchema } = require('../utils/Validators');
 
 const User = db.User;
 
 const registerUser = expressAsyncHandler(async (req, res, next) => {
-    const {email} = req.body;
+    const { email } = req.body;
     if (!req.body) {
-        return res.status(400).json({error: true, message: "Request not provided"});
+        return res.status(400).json({ error: true, message: "Request not provided" });
     }
 
     const validateUsersData = await createUserValidationSchema.validate(req.body, {
         abortEarly: false
     });
 
-    const existingUser = await User.findOne({where: {email}});
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
         return res.status(400).json({
             error: true, message: "User with this email already exists."
@@ -45,8 +45,8 @@ const registerUser = expressAsyncHandler(async (req, res, next) => {
 });
 
 const loginUser = expressAsyncHandler(async (req, res, next) => {
-    const {email, password} = req.body;
-    const checkUserExists = await User.findOne({where: {email}});
+    const { email, password } = req.body;
+    const checkUserExists = await User.findOne({ where: { email } });
     if (!email || !password || !checkUserExists) {
         return res.status(400).json({
             error: true, message: "Invalid email or password"
@@ -72,8 +72,8 @@ const loginUser = expressAsyncHandler(async (req, res, next) => {
         email: checkUserExists.email,
         role: checkUserExists.role,
         isActive: checkUserExists.isActive,
+        access_token: accessToken
     };
-    console.log("userData", userData);
     return res.status(200).json({
         success: true, message: 'User logged successfully', user_details: userData
     });
