@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5174,
+    allowedHosts: ["chat-app-client-qoev.onrender.com"],
     proxy: {
       "/v1": {
         target: "http://localhost:5000", // local dev
