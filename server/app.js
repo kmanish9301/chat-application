@@ -47,4 +47,5 @@ app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-connectDB(server, PORT);
+const APP_URL = process.env.APP_BASE_URL || 'http://localhost:5000'
+connectDB(server, PORT, APP_URL);

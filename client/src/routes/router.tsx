@@ -6,7 +6,9 @@ import ProtectedRoute from "./ProtectedRoute";
 const PageNotFound = lazy(() => import("../commoncomponents/PageNotFound"));
 const Login = lazy(() => import("../components/login/Login"));
 const Register = lazy(() => import("../components/login/Register"));
-const Dashboard = lazy(() => import("../components/main/Dashboard"));
+const DefaultChatComponent = lazy(
+  () => import("../components/main/DefaultChatComponent")
+);
 const Layout = lazy(() => import("../components/_layout/Layout"));
 
 const router = createBrowserRouter([
@@ -19,8 +21,8 @@ const router = createBrowserRouter([
         element: <Layout />,
         errorElement: <PageNotFound />,
         children: [
-          { index: true, element: <Dashboard /> },
-          { path: "chats", element: <ChatMainContainer /> },
+          { index: true, element: <DefaultChatComponent /> },
+          { path: "chats/:chatId", element: <ChatMainContainer /> },
         ],
       },
     ],

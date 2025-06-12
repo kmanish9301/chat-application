@@ -1,6 +1,6 @@
 const db = require("../models/index");
 const expressAsyncHandler = require("express-async-handler");
-const {Op} = require("sequelize");
+const { Op } = require("sequelize");
 
 const Chat = db.Chat;
 const User = db.User;
@@ -11,23 +11,23 @@ const createChat = expressAsyncHandler(async (req, res) => {
             error: true, message: "Request not provided."
         })
     }
-    const {senderId, receiverId} = req.body;
-    const chat = await Chat.create({senderId, receiverId});
-    return res.status(200).json({success: true, message: "Chat created successfully.", chats: [chat]});
+    const { senderId, receiverId } = req.body;
+    const chat = await Chat.create({ senderId, receiverId });
+    return res.status(200).json({ success: true, message: "Chat created successfully.", chats: [chat] });
 })
 
 const getAllChats = expressAsyncHandler(async (req, res) => {
-    const {usedId} = req.params;
+    const { usedId } = req.params;
     const chats = await Chat.findAll({
         where: {
             [Op.or]: [
-                {senderId: usedId},
-                {receiverId: usedId},
+                { senderId: usedId },
+                { receiverId: usedId },
             ]
         },
         include: [
-            {model: User, as: 'sender', attributes: ['id', 'user_name', 'email']},
-            {model: User, as: 'receiver', attributes: ['id', 'user_name', 'email']}
+            { model: User, as: 'sender', attributes: ['id', 'user_name', 'email'] },
+            { model: User, as: 'receiver', attributes: ['id', 'user_name', 'email'] }
         ],
         order: [['createdAt', 'DESC']],
     });
@@ -37,11 +37,11 @@ const getAllChats = expressAsyncHandler(async (req, res) => {
             error: true, message: "No chats found."
         })
     }
-    return res.status(200).json({success: true, chats: chats});
+    return res.status(200).json({ success: true, chats: chats });
 })
 
 const deleteChat = expressAsyncHandler(async (req, res) => {
-    const {chatId} = req.params;
+    const { chatId } = req.params;
     const chat = await Chat.findByPk(chatId);
     if (!chat) {
         return res.status(404).json({
@@ -49,7 +49,7 @@ const deleteChat = expressAsyncHandler(async (req, res) => {
         })
     }
     await chat.destroy();
-    return res.status(200).json({success: true, message: "Chat deleted successfully."});
+    return res.status(200).json({ success: true, message: "Chat deleted successfully." });
 })
 
-module.exports = {createChat, getAllChats, deleteChat};
+module.exports = { createChat, getAllChats, deleteChat };
