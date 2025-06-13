@@ -3,6 +3,7 @@ const expressAsyncHandler = require('express-async-handler');
 const { generateToken } = require('../middlewares/AuthMiddleware');
 const db = require("../models/index");
 const { createUserValidationSchema } = require('../utils/Validators');
+const { Op } = require('sequelize');
 
 const User = db.User;
 
@@ -68,6 +69,7 @@ const loginUser = expressAsyncHandler(async (req, res, next) => {
     await checkUserExists.save();
 
     const userData = {
+        userId: checkUserExists.id,
         user_name: checkUserExists.user_name,
         email: checkUserExists.email,
         role: checkUserExists.role,
@@ -80,19 +82,38 @@ const loginUser = expressAsyncHandler(async (req, res, next) => {
 });
 
 const getAllUsers = expressAsyncHandler(async (req, res, next) => {
-    const users = await User.findAll();
-    if (users.length === 0) {
+    const { searchString } = req.query;
+
+    const filterByUserName = searchString
+        ? {
+            user_name: {
+                [Op.iLike]: `%${searchString}%`, // partial match
+            },
+        }
+        : {};
+
+    const users = await User.findAll({ where: filterByUserName });
+
+    if (!users || users.length === 0) {
         return res.status(404).json({
-            error: true, message: "Users not found"
+            error: true,
+            message: "Users not found",
         });
     }
 
     const usersData = users.map((user) => ({
-        id: user.id, user_name: user.user_name, email: user.email, role: user.role, isActive: user.isActive
+        id: user.id,
+        user_name: user.user_name,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive,
+        lastActive: user.updatedAt,
     }));
 
     return res.status(200).json({
-        success: true, results: usersData, count: usersData.length
+        success: true,
+        results: usersData,
+        count: usersData.length,
     });
 });
 
@@ -131,6 +152,25 @@ const getUserDetails = expressAsyncHandler(async (req, res, next) => {
     });
 });
 
+const logoutUser = expressAsyncHandler(async (req, res, next) => {
+    const userId = req.body?.id
+    console.log(" userId:", userId);
+
+    if (!userId) {
+        return res.status(400).json({
+            error: true,
+            message: "Unauthorized"
+        })
+    }
+
+    await User.update({ isActive: false }, { where: { id: userId } });
+
+    return res.status(200).json({
+        success: true,
+        message: "Logout successful"
+    })
+});
+
 module.exports = {
-    registerUser, loginUser, getAllUsers, deleteUser, getUserDetails
+    registerUser, loginUser, getAllUsers, deleteUser, getUserDetails, logoutUser
 };
